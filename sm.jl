@@ -35,7 +35,7 @@ function SimulatedAnneling(filename::String)
 
         X_i = [0.0 0.0 0.0]
         for i in 1:3
-            X_i[i] = X_0[i] + rand(Normal(0, T[i])) # rand(0:0.01:T[i]) 
+            X_i[i] = X_0[i] + rand(Normal(0, T[i]))
         end
 
         f_x_last = f_x
@@ -46,14 +46,12 @@ function SimulatedAnneling(filename::String)
 
         if f_0 > f_x
             X_0 = X_i
-            #display(X_0)
         else 
             for i in 1:3
                 r = rand(0:0.001:1)
                 
                 if r < exp((f_0 - f_x) / T[i])
                     X_0[i] = X_i[i]
-                #        display(X_0)
                 end
             end
         end
@@ -95,21 +93,19 @@ function SimulatedAnnelingOpt(filename::String; T_0::Number = 10^6, alpha::Numbe
 
         X_i = [0.0 0.0 0.0]
         for i in eachindex(X_i)
-            X_i[i] = X_0[i] + rand(Normal(0, T[i])) # rand(0:0.01:T[i]) 
+            X_i[i] = X_0[i] + rand(Normal(0, T[i])) 
         end
         f_x_last = f_x
         f_x = mean_f(data_frame, X_i)
 
         if f_0 > f_x
             X_0 = X_i
-            # display(X_0)
         else 
             for i in 1:3
                 r = rand(0:0.001:1)
                 
                 if r < exp((f_0 - f_x) / T[i])
                     X_0[i] = X_i[i]
-                    # display(X_0)
                 end
             end
         end
@@ -125,41 +121,7 @@ function SimulatedAnnelingOpt(filename::String; T_0::Number = 10^6, alpha::Numbe
     
     scatter(data_frame[1, :], data_frame[2, :], color=:blue)
     scatter!(data_frame[1, :], results[:], color=:red)
-    # return (results, f_x, iter)
 end
 
 # @time SimulatedAnneling("data/model1.txt")
 @time SimulatedAnnelingOpt("data/model1.txt", T_0=10.0^3, alpha=0.999, schedule=exponential!)
-
-
-# data = "data/model1.txt"
-
-# alphas = [0.999, 0.9999, 0.99999]
-# pcs = [0.001, 0.0001, 0.00001]
-# T_0 = [10.0^3, 10.0^4, 10.0^5, 10.0^6, 10.0^7]
-
-# error = Vector(undef, 3)
-# data_frame = Matrix(CSV.read(data, DataFrame, delim=" ")[:, 2:3])
-# data_frame = transpose(data_frame)
-
-# open("report_alpha.txt", "w+") do f
-#     for alph in alphas
-#         for t_0 in T_0
-#             write(f, "\nAlpha: $alph\nT_0: $t_0\n\n")
-#             ten_best_iter = Vector(undef, 10)
-#             for i in 1:3
-#                 best = @timed SimulatedAnnelingOpt(
-#                     data,
-#                     T_0=t_0,
-#                     alpha=alph,
-#                     schedule=exponential!
-#                 )
-
-#                 ten_best_iter[i] = (best.value[1][1], best.value[1][3], best.time)
-#                 write(f, "$((best.value[1][1], best.value[1][3], best.time))\n")
-#             end
-
-#             # write(f, "\nStandard deviation: $(std(error))\nMean: $(mean(error))\nMedian $(median(error))\n\n")
-#         end
-#     end
-# end
